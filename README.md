@@ -91,8 +91,3 @@
 TBD
 
 ---
-
-### Reporting Bugs
-
-   Visit the [Issues page](https://github.com/kevinbowen777/pixshare/issues)
-      to view currently open bug reports or open a new issue.

@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load thumbnail %}
+{% load static %}
+
+{% block title %}
+  {{ user.get_full_name }}
+{% endblock title %}
+
+{% block content %}
+  <h1>{{ user.get_full_name }}</h1>
+
+  <div class="profile-info" style="text-align: center; margin-bottom: 20px;">
+    {% if user.profile.photo %}
+      {% thumbnail user.profile.photo "180x180" crop="center" as im %}
+        <img src="{{ im.url }}"
+             alt="{{ user.username }}"
+             class="user-detail"
+             width="180"
+             height="180"
+             style="border-radius: 50%; object-fit: cover;">
+      {% endthumbnail %}
+    {% else %}
+      <img src="{% static 'images/default-avatar.png' %}"
+           alt="default avatar"
+           width="180"
+           height="180"
+           style="border-radius: 50%; object-fit: cover;">
+    {% endif %}
+  </div>
+
+  {% with total_followers=user.followers.count %}
+    <div style="text-align: center; margin-bottom: 20px;">
+      <span class="count" style="font-size: 16px;">
+        <span class="total">{{ total_followers }}</span>
+        follower{{ total_followers|pluralize }}
+      </span>
+      <br>
+      <a href="#"
+         data-id="{{ user.id }}"
+         data-action="{% if request.user in user.followers.all %}un{% endif %}follow"
+         class="follow button"
+         style="display: inline-block; margin-top: 10px; padding: 6px 14px; border-radius: 6px; background-color: #007bff; color: #fff; text-decoration: none;">
+        {% if request.user not in user.followers.all %}
+          Follow
+        {% else %}
+          Unfollow
+        {% endif %}
+      </a>
+    </div>
+
+    <div id="image-list" class="image-container">
+      {% include "images/image/list_images.html" with images=user.images_created.all %}
+    </div>
+  {% endwith %}
+
+  <h2>Foydalanuvchi ma'lumotlari</h2>
+  <ul style="line-height: 1.8;">
+    <li><strong>ID:</strong> {{ user.id }}</li>
+    <li><strong>Ism:</strong> {{ user.first_name|default:"—" }}</li>
+    <li><strong>Last-name:</strong> {{ user.last_name|default:"—" }}</li>
+    <li><strong>Email:</strong> {{ user.email|default:"—" }}</li>
+    <li><strong>Date of birth:</strong> {{ user.date_of_birth|default:"—" }}</li>
+  </ul>
+{% endblock content %}
+
+{% block domready %}
+  const url = '{% url "user_follow" %}';
+  var options = {
+    method: 'POST',
+    headers: {'X-CSRFToken': csrftoken},
+    mode: 'same-origin'
+  }
+
+  const followButton = document.querySelector('a.follow');
+  if (followButton) {
+    followButton.addEventListener('click', function(e) {
+      e.preventDefault();
+
+      const formData = new FormData();
+      formData.append('id', followButton.dataset.id);
+      formData.append('action', followButton.dataset.action);
+      options['body'] = formData;
+
+      fetch(url, options)
+      .then(response => response.json())
+      .then(data => {
+        if (data['status'] === 'ok') {
+          const previousAction = followButton.dataset.action;
+          const action = previousAction === 'follow' ? 'unfollow' : 'follow';
+          followButton.dataset.action = action;
+          followButton.innerHTML = action.charAt(0).toUpperCase() + action.slice(1);
+
+          const followerCount = document.querySelector('span.count .total');
+          let totalFollowers = parseInt(followerCount.innerHTML);
+          followerCount.innerHTML = previousAction === 'follow' ? totalFollowers + 1 : totalFollowers - 1;
+        }
+      });
+    });
+  }
+{% endblock domready %}

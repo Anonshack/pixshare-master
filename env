@@ -1,0 +1,19 @@
+export PATH="/root/.local/bin:$PATH"
+export DJANGO_DEBUG=True
+
+export EMAIL_HOST_PASSWORD='<email_host_password>'
+export DOCKER_BUILDKIT=1
+
+export COMPOSE_PROFILES=postgres,web
+export COMPOSE_PROJECT_NAME=pixshare
+
+
+export SECRET_KEY=django-insecure-_zl&hsj$*op!*fj@m4h@9cj#+%ikzg*_6366ha#@qphvd^&j6f
+POSTGRES_USER=myuser
+POSTGRES_PASSWORD=12345
+POSTGRES_DB=learn
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+
+
+

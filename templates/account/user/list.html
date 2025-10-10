@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load thumbnail %}
+{% load static %}
+
+{% block title %}People{% endblock %}
+
+{% block content %}
+  <h1>People</h1>
+
+  <div id="people-list" style="display: flex; flex-wrap: wrap; gap: 20px;">
+    {% for user in users %}
+      <div class="user" style="text-align: center;">
+        <a href="{{ user.get_absolute_url }}">
+          {% if user.profile.photo %}
+            {% thumbnail user.profile.photo "180x180" crop="center" as im %}
+              <img src="{{ im.url }}"
+                   alt="{{ user.username }}"
+                   width="180"
+                   height="180"
+                   style="border-radius: 50%; object-fit: cover;">
+            {% endthumbnail %}
+          {% else %}
+            <img src="{% static 'images/default-avatar.png' %}"
+                 alt="default avatar"
+                 width="180"
+                 height="180"
+                 style="border-radius: 50%; object-fit: cover;">
+          {% endif %}
+        </a>
+        <div class="info" style="margin-top: 10px;">
+          <a href="{{ user.get_absolute_url }}" class="title" style="font-weight: bold; text-decoration: none;">
+            {{ user.get_full_name|default:user.username }}
+          </a>
+          <p style="color: gray; font-size: 14px;">{{ user.email }}</p>
+        </div>
+      </div>
+    {% empty %}
+      <p>Hozircha foydalanuvchilar yo‘q.</p>
+    {% endfor %}
+  </div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load thumbnail %}
+
+{% block title %}Images{% endblock title %}
+
+{% block content %}
+  <h1>All Images</h1>
+
+  <div class="image-grid">
+    {% for image in images %}
+      <div class="image-card">
+        <a href="{{ image.get_absolute_url }}">
+          {% thumbnail image.image 300x300 crop="smart" as im %}
+            <img src="{{ im.url }}" alt="{{ image.title }}" width="300" height="300">
+          {% endthumbnail %}
+        </a>
+        <div class="info">
+          <a href="{{ image.get_absolute_url }}" class="title">{{ image.title }}</a>
+          <p>Uploaded by: {{ image.user.username }}</p>
+        </div>
+      </div>
+    {% empty %}
+      <p>No images available.</p>
+    {% endfor %}
+  </div>
+
+{% endblock content %}
+
+<style>
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+.image-card {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  text-align: center;
+  background: #fff;
+}
+.image-card img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+}
+.image-card .info {
+  padding: 10px;
+}
+.image-card .title {
+  font-weight: bold;
+  color: #333;
+  text-decoration: none;
+}
+.image-card .title:hover {
+  color: #007bff;
+}
+</style>
